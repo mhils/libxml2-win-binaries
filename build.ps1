@@ -40,11 +40,11 @@ Function BundleRelease($name, $lib, $inc)
 
     New-Item -ItemType Directory .\dist\$name\include
     Copy-Item -Recurse $inc .\dist\$name\include
-    Compress-Archive  .\dist\$name\* .\dist\$name.zip
+    Compress-Archive  .\dist\$name .\dist\$name.zip
     Remove-Item -Recurse -Path .\dist\$name
 }
 
-Remove-Item -Recurse -Path .\dist
+if (Test-Path .\dist) { Remove-Item .\dist -Recurse }
 New-Item -ItemType Directory .\dist
 BundleRelease "iconv-1.14.win32" (dir $iconvLib\*) (dir $iconvInc\*.h)
 BundleRelease "libxml2-2.9.4.win32" (dir $xmlLib\*.lib,$xmlLib\*.exp) (dir $xmlInc\libxml\*.h)
