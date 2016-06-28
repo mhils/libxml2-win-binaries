@@ -1,15 +1,17 @@
-# libxml Windows binaries
+# libxml2 Windows binaries for lxml
 
-This repository contains everything that's needed to compile libiconv, libxml2, and libxslt on Windows with Visual Studio 2015 / UCRT so that it can be used to build lxml wheels for Python 3.5.
+This repository contains everything required to compile libiconv, libxml2, and libxslt on Windows with Visual Studio 2015 / UCRT so that it can be used to build lxml wheels for Python 3.5.
 
 ## Instructions
 
-1. Open a Powershell prompt and install the Powershell Community Tools:
+- Install the [Visual C++ Build Tools](http://landinghub.visualstudio.com/visual-cpp-build-tools) (or Visual Studio).
+- Open a Powershell prompt and install the Powershell Community Tools: 
 ```powershell
 Set-ExecutionPolicy remotesigned
 Find-Package pscx | ? ProviderName -eq PSModule | Install-Package -Force
 ```
-2. Run build.ps1
+- Run `build.ps1`
+- Take binaries from `dist/`
 
 ## Acknowledgements
 
