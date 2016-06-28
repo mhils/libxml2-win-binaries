@@ -1,0 +1,9 @@
+[submodule "libiconv"]
+	path = libiconv
+	url = https://github.com/winlibs/libiconv
+[submodule "libxml2"]
+	path = libxml2
+	url = https://github.com/winlibs/libxml2
+[submodule "libxslt"]
+	path = libxslt
+	url = https://github.com/mhils/libxslt
