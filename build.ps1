@@ -1,3 +1,7 @@
+<#
+This script builds libiconv,libxml2 and libxslt
+#>
+
 $ErrorActionPreference = "Stop"
 Import-Module Pscx
 
@@ -5,19 +9,15 @@ cd $PSScriptRoot
 
 # Change theset two lines to change VS version
 Import-VisualStudioVars -VisualStudioVersion 140 -Architecture x86
+
 cd .\libiconv\MSVC14
-
-
 msbuild libiconv.sln /p:Configuration=Release 
 # /p:Platform=Win32
 # msbuild libiconv.sln /p:Configuration=Release /p:Platform=x64
 $iconvLib = Join-Path (pwd) libiconv_static\Release
-
-# lxml expects this to be called iconv, not libiconv
-Dir $iconvLib\iconv* | Remove-Item -Recurse
-Dir $iconvLib\libiconv* | Rename-Item -NewName { $_.Name -replace "libiconv","iconv" }
-
 $iconvInc = Join-Path (pwd) ..\source\include
+# Make sure that libiconv.(lib|exp) is included
+Copy-Item -Force (Join-Path (pwd) Release\*) -Destination $iconvLib
 cd ..\..
 
 cd .\libxml2\win32
@@ -52,6 +52,11 @@ Function BundleRelease($name, $lib, $inc)
 
 if (Test-Path .\dist) { Remove-Item .\dist -Recurse }
 New-Item -ItemType Directory .\dist
-BundleRelease "iconv-1.14.win32" (dir $iconvLib\*) (dir $iconvInc\*)
+
+# lxml expects iconv to be called iconv, not libiconv
+Dir $iconvLib\libiconv* | Copy-Item -Force -Destination {Join-Path $iconvLib ($_.Name -replace "libiconv","iconv") }
+Remove-Item (Join-Path $iconvLib iconv_static.tlog)
+
+BundleRelease "iconv-1.14.win32" (dir $iconvLib\iconv* | Where-Object {$_.Name -notmatch "^libiconv"}) (dir $iconvInc\*)
 BundleRelease "libxml2-2.9.4.win32" (dir $xmlLib\*) (Get-Item $xmlInc\libxml)
 BundleRelease "libxslt-1.1.27.win32" (dir .\libxslt\win32\bin.msvc\*) (Get-Item .\libxslt\libxslt,.\libxslt\libexslt)
