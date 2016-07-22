@@ -59,4 +59,4 @@ Remove-Item (Join-Path $iconvLib iconv_static.tlog)
 
 BundleRelease "iconv-1.14.win32" (dir $iconvLib\iconv* | Where-Object {$_.Name -notmatch "^libiconv"}) (dir $iconvInc\*)
 BundleRelease "libxml2-2.9.4.win32" (dir $xmlLib\*) (Get-Item $xmlInc\libxml)
-BundleRelease "libxslt-1.1.27.win32" (dir .\libxslt\win32\bin.msvc\*) (Get-Item .\libxslt\libxslt,.\libxslt\libexslt)
+BundleRelease "libxslt-1.1.29.win32" (dir .\libxslt\win32\bin.msvc\*) (Get-Item .\libxslt\libxslt,.\libxslt\libexslt)

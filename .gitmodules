@@ -6,4 +6,4 @@
 	url = https://github.com/winlibs/libxml2
 [submodule "libxslt"]
 	path = libxslt
-	url = https://github.com/mhils/libxslt
+	url = https://github.com/winlibs/libxslt
