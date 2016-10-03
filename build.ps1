@@ -1,23 +1,29 @@
 <#
 This script builds libiconv,libxml2 and libxslt
 #>
+Param([switch]$x64)
 
 $ErrorActionPreference = "Stop"
 Import-Module Pscx
 
+$x64Dir = If($x64) { "\x64" } Else { "" }
+$distname = If($x64) { "win64" } Else { "win32" }
+
 cd $PSScriptRoot
 
 # Change theset two lines to change VS version
-Import-VisualStudioVars -VisualStudioVersion 140 -Architecture x86
+if($x64) {
+    Import-VisualStudioVars -VisualStudioVersion 140 -Architecture x64
+} else {
+    Import-VisualStudioVars -VisualStudioVersion 140 -Architecture x86
+}
 
 cd .\libiconv\MSVC14
 msbuild libiconv.sln /p:Configuration=Release 
-# /p:Platform=Win32
-# msbuild libiconv.sln /p:Configuration=Release /p:Platform=x64
-$iconvLib = Join-Path (pwd) libiconv_static\Release
+$iconvLib = Join-Path (pwd) libiconv_static$x64Dir\Release
 $iconvInc = Join-Path (pwd) ..\source\include
 # Make sure that libiconv.(lib|exp) is included
-Copy-Item -Force (Join-Path (pwd) Release\*) -Destination $iconvLib
+Copy-Item -Force (Join-Path (pwd) .\$x64Dir\Release\*) -Destination $iconvLib
 cd ..\..
 
 cd .\libxml2\win32
@@ -32,6 +38,9 @@ cscript configure.js lib="$iconvLib;$xmlLib" include="$iconvInc;$xmlInc" vcmanif
 nmake
 cd ..\..
 
+cd .\zlib
+nmake -f win32/Makefile.msc
+cd ..
 
 # Bundle releases
 Function BundleRelease($name, $lib, $inc)
@@ -57,6 +66,7 @@ New-Item -ItemType Directory .\dist
 Dir $iconvLib\libiconv* | Copy-Item -Force -Destination {Join-Path $iconvLib ($_.Name -replace "libiconv","iconv") }
 Remove-Item (Join-Path $iconvLib iconv_static.tlog)
 
-BundleRelease "iconv-1.14.win32" (dir $iconvLib\iconv* | Where-Object {$_.Name -notmatch "^libiconv"}) (dir $iconvInc\*)
-BundleRelease "libxml2-2.9.4.win32" (dir $xmlLib\*) (Get-Item $xmlInc\libxml)
-BundleRelease "libxslt-1.1.29.win32" (dir .\libxslt\win32\bin.msvc\*) (Get-Item .\libxslt\libxslt,.\libxslt\libexslt)
+BundleRelease "iconv-1.14.$distname" (dir $iconvLib\iconv* | Where-Object {$_.Name -notmatch "^libiconv"}) (dir $iconvInc\*)
+BundleRelease "libxml2-2.9.4.$distname" (dir $xmlLib\*) (Get-Item $xmlInc\libxml)
+BundleRelease "libxslt-1.1.29.$distname" (dir .\libxslt\win32\bin.msvc\*) (Get-Item .\libxslt\libxslt,.\libxslt\libexslt)
+BundleRelease "zlib-1.2.8.$distname" (Get-Item .\zlib\*.*) (Get-Item .\zlib\zconf.h,.\zlib\zlib.h)
