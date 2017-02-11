@@ -1,0 +1,18 @@
+environment:
+  matrix:
+  - Architecture: x86
+  - Architecture: x64
+install:
+- cmd: git submodule update --init --recursive
+- ps: install-module pscx -scope CurrentUser
+build: off
+build_script:
+- ps: >-
+    if ($env:Architecture -eq 'x64') {
+       .\build.ps1 -x64
+    } else {
+       .\build.ps1
+    }
+test: off
+artifacts:
+- path: dist/*
