@@ -24,23 +24,26 @@ $iconvLib = Join-Path (pwd) libiconv_static$x64Dir\Release
 $iconvInc = Join-Path (pwd) ..\source\include
 # Make sure that libiconv.(lib|exp) is included
 Copy-Item -Force (Join-Path (pwd) .\$x64Dir\Release\*) -Destination $iconvLib
-cd ..\..
+cd -
 
 cd .\libxml2\win32
 cscript configure.js lib="$iconvLib" include="$iconvInc" vcmanifest=yes
 Start-Process -NoNewWindow -Wait nmake
 $xmlLib = Join-Path (pwd) bin.msvc
 $xmlInc = Join-Path (pwd) ..\include
-cd ..\..
+cd -
 
 cd .\libxslt\win32
 cscript configure.js lib="$iconvLib;$xmlLib" include="$iconvInc;$xmlInc" vcmanifest=yes
 Start-Process -NoNewWindow -Wait nmake
-cd ..\..
+cd -
 
 cd .\zlib
 Start-Process -NoNewWindow -Wait nmake "-f win32/Makefile.msc"
-cd ..
+cd -
+
+# Pushed by Import-VisualStudioVars
+Pop-EnvironmentBlock
 
 # Bundle releases
 Function BundleRelease($name, $lib, $inc)
