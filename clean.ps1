@@ -10,7 +10,7 @@ ForEach ($repo in "libiconv","libxslt","libxml2","zlib") {
     cd $repo
     Get-ChildItem -Exclude .git . | Remove-Item -Recurse
     git reset --hard
-    cd ..
+    cd -
 }
 
 if (Test-Path .\dist) { Remove-Item .\dist -Recurse }
