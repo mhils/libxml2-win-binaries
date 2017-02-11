@@ -42,6 +42,9 @@ cd .\zlib
 nmake -f win32/Makefile.msc
 cd ..
 
+# Pushed by Import-VisualStudioVars
+Pop-EnvironmentBlock
+
 # Bundle releases
 Function BundleRelease($name, $lib, $inc)
 {
