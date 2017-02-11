@@ -3,14 +3,14 @@ This script resets all submodules to a clean state so that no previous build art
 #>
 
 $ErrorActionPreference = "Stop"
-cd $PSScriptRoot
+Set-Location $PSScriptRoot
 
 ForEach ($repo in "libiconv","libxslt","libxml2","zlib") {
     echo "Cleaning up $repo..."
-    cd $repo
-    Get-ChildItem -Exclude .git . | Remove-Item -Recurse
+    Set-Location $repo
+    git clean -f -x -d -q
     git reset --hard
-    cd -
+    Set-Location ..
 }
 
 if (Test-Path .\dist) { Remove-Item .\dist -Recurse }

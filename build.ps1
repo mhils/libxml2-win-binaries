@@ -9,7 +9,7 @@ Import-Module Pscx
 $x64Dir = If($x64) { "\x64" } Else { "" }
 $distname = If($x64) { "win64" } Else { "win32" }
 
-cd $PSScriptRoot
+Set-Location $PSScriptRoot
 
 # Change theset two lines to change VS version
 if($x64) {
@@ -18,29 +18,29 @@ if($x64) {
     Import-VisualStudioVars -VisualStudioVersion 140 -Architecture x86
 }
 
-cd .\libiconv\MSVC14
+Set-Location .\libiconv\MSVC14
 msbuild libiconv.sln /p:Configuration=Release 
 $iconvLib = Join-Path (pwd) libiconv_static$x64Dir\Release
 $iconvInc = Join-Path (pwd) ..\source\include
 # Make sure that libiconv.(lib|exp) is included
 Copy-Item -Force (Join-Path (pwd) .\$x64Dir\Release\*) -Destination $iconvLib
-cd -
+Set-Location ..\..
 
-cd .\libxml2\win32
+Set-Location .\libxml2\win32
 cscript configure.js lib="$iconvLib" include="$iconvInc" vcmanifest=yes
 Start-Process -NoNewWindow -Wait nmake
 $xmlLib = Join-Path (pwd) bin.msvc
 $xmlInc = Join-Path (pwd) ..\include
-cd -
+Set-Location ..\..
 
-cd .\libxslt\win32
+Set-Location .\libxslt\win32
 cscript configure.js lib="$iconvLib;$xmlLib" include="$iconvInc;$xmlInc" vcmanifest=yes
 Start-Process -NoNewWindow -Wait nmake
-cd -
+Set-Location ..\..
 
-cd .\zlib
+Set-Location .\zlib
 Start-Process -NoNewWindow -Wait nmake "-f win32/Makefile.msc"
-cd -
+Set-Location ..
 
 # Pushed by Import-VisualStudioVars
 Pop-EnvironmentBlock
