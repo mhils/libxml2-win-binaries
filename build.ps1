@@ -28,18 +28,18 @@ cd ..\..
 
 cd .\libxml2\win32
 cscript configure.js lib="$iconvLib" include="$iconvInc" vcmanifest=yes
-nmake
+Start-Process -NoNewWindow -Wait nmake
 $xmlLib = Join-Path (pwd) bin.msvc
 $xmlInc = Join-Path (pwd) ..\include
 cd ..\..
 
 cd .\libxslt\win32
 cscript configure.js lib="$iconvLib;$xmlLib" include="$iconvInc;$xmlInc" vcmanifest=yes
-nmake
+Start-Process -NoNewWindow -Wait nmake
 cd ..\..
 
 cd .\zlib
-nmake -f win32/Makefile.msc
+Start-Process -NoNewWindow -Wait nmake "-f win32/Makefile.msc"
 cd ..
 
 # Bundle releases
