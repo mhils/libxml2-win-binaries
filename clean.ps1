@@ -8,7 +8,7 @@ Set-Location $PSScriptRoot
 ForEach ($repo in "libiconv","libxslt","libxml2","zlib") {
     echo "Cleaning up $repo..."
     Set-Location $repo
-    Get-ChildItem -Exclude .git . | Remove-Item -Recurse
+    git clean -f -x -d -q
     git reset --hard
     Set-Location ..
 }
