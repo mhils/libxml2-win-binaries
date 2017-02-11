@@ -1,6 +1,6 @@
 # libxml2 Windows binaries for lxml
 
-![appveyor ci status](https://ci.appveyor.com/api/projects/status/cc6q3nrosjul2sgl?svg=true)
+[![Build status](https://ci.appveyor.com/api/projects/status/cc6q3nrosjul2sgl?svg=true)](https://ci.appveyor.com/project/mhils/libxml2-win-binaries)
 
 This repository contains everything required to compile libiconv, libxml2, and libxslt on Windows with Visual Studio 2015 / UCRT so that it can be used to build lxml wheels for Python 3.5.
 
