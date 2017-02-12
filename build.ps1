@@ -19,7 +19,7 @@ if($x64) {
 }
 
 Set-Location .\libiconv\MSVC14
-msbuild libiconv.sln /p:Configuration=Release 
+msbuild libiconv.sln /p:Configuration=Release /t:libiconv_static
 $iconvLib = Join-Path (pwd) libiconv_static$x64Dir\Release
 $iconvInc = Join-Path (pwd) ..\source\include
 # Make sure that libiconv.(lib|exp) is included
@@ -28,18 +28,18 @@ Set-Location ..\..
 
 Set-Location .\libxml2\win32
 cscript configure.js lib="$iconvLib" include="$iconvInc" vcmanifest=yes
-Start-Process -NoNewWindow -Wait nmake
+Start-Process -NoNewWindow -Wait nmake libxmla
 $xmlLib = Join-Path (pwd) bin.msvc
 $xmlInc = Join-Path (pwd) ..\include
 Set-Location ..\..
 
 Set-Location .\libxslt\win32
 cscript configure.js lib="$iconvLib;$xmlLib" include="$iconvInc;$xmlInc" vcmanifest=yes
-Start-Process -NoNewWindow -Wait nmake
+Start-Process -NoNewWindow -Wait nmake "libxslta libexslta"
 Set-Location ..\..
 
 Set-Location .\zlib
-Start-Process -NoNewWindow -Wait nmake "-f win32/Makefile.msc"
+Start-Process -NoNewWindow -Wait nmake "-f win32/Makefile.msc zlib.lib"
 Set-Location ..
 
 # Pushed by Import-VisualStudioVars
