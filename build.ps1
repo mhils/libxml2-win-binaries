@@ -22,8 +22,6 @@ Set-Location .\libiconv\MSVC14
 msbuild libiconv.sln /p:Configuration=Release /t:libiconv_static
 $iconvLib = Join-Path (pwd) libiconv_static$x64Dir\Release
 $iconvInc = Join-Path (pwd) ..\source\include
-# Make sure that libiconv.(lib|exp) is included
-Copy-Item -Force (Join-Path (pwd) .\$x64Dir\Release\*) -Destination $iconvLib
 Set-Location ..\..
 
 Set-Location .\libxml2\win32
@@ -67,9 +65,8 @@ New-Item -ItemType Directory .\dist
 
 # lxml expects iconv to be called iconv, not libiconv
 Dir $iconvLib\libiconv* | Copy-Item -Force -Destination {Join-Path $iconvLib ($_.Name -replace "libiconv","iconv") }
-Remove-Item (Join-Path $iconvLib iconv_static.tlog)
 
-BundleRelease "iconv-1.14.$distname" (dir $iconvLib\iconv* | Where-Object {$_.Name -notmatch "^libiconv"}) (dir $iconvInc\*)
+BundleRelease "iconv-1.14.$distname" (dir $iconvLib\iconv_a*) (dir $iconvInc\*)
 BundleRelease "libxml2-2.9.4.$distname" (dir $xmlLib\*) (Get-Item $xmlInc\libxml)
 BundleRelease "libxslt-1.1.29.$distname" (dir .\libxslt\win32\bin.msvc\*) (Get-Item .\libxslt\libxslt,.\libxslt\libexslt)
 BundleRelease "zlib-1.2.8.$distname" (Get-Item .\zlib\*.*) (Get-Item .\zlib\zconf.h,.\zlib\zlib.h)
