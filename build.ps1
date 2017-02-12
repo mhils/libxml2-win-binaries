@@ -19,28 +19,28 @@ if($x64) {
 }
 
 Set-Location .\libiconv\MSVC14
-msbuild libiconv.sln /p:Configuration=Release 
+msbuild libiconv.sln /p:Configuration=Release /t:libiconv_static
 $iconvLib = Join-Path (pwd) libiconv_static$x64Dir\Release
 $iconvInc = Join-Path (pwd) ..\source\include
-# Make sure that libiconv.(lib|exp) is included
-Copy-Item -Force (Join-Path (pwd) .\$x64Dir\Release\*) -Destination $iconvLib
 Set-Location ..\..
 
+Set-Location .\zlib
+Start-Process -NoNewWindow -Wait nmake "-f win32/Makefile.msc zlib.lib"
+$zlibLib = (pwd)
+$zlibInc = (pwd)
+Set-Location ..
+
 Set-Location .\libxml2\win32
-cscript configure.js lib="$iconvLib" include="$iconvInc" vcmanifest=yes
-Start-Process -NoNewWindow -Wait nmake
+cscript configure.js lib="$zlibLib;$iconvLib" include="$zlibInc;$iconvInc" vcmanifest=yes zlib=yes
+Start-Process -NoNewWindow -Wait nmake libxmla
 $xmlLib = Join-Path (pwd) bin.msvc
 $xmlInc = Join-Path (pwd) ..\include
 Set-Location ..\..
 
 Set-Location .\libxslt\win32
-cscript configure.js lib="$iconvLib;$xmlLib" include="$iconvInc;$xmlInc" vcmanifest=yes
-Start-Process -NoNewWindow -Wait nmake
+cscript configure.js lib="$zlibLib;$iconvLib;$xmlLib" include="$zlibInc;$iconvInc;$xmlInc" vcmanifest=yes zlib=yes
+Start-Process -NoNewWindow -Wait nmake "libxslta libexslta"
 Set-Location ..\..
-
-Set-Location .\zlib
-Start-Process -NoNewWindow -Wait nmake "-f win32/Makefile.msc"
-Set-Location ..
 
 # Pushed by Import-VisualStudioVars
 Pop-EnvironmentBlock
@@ -52,7 +52,7 @@ Function BundleRelease($name, $lib, $inc)
 
     New-Item -ItemType Directory .\dist\$name\lib
     Copy-Item -Recurse $lib .\dist\$name\lib
-    Get-ChildItem -File -Recurse .\dist\$name\lib | Where{$_.Name -NotMatch ".(lib|exp)$" } | Remove-Item
+    Get-ChildItem -File -Recurse .\dist\$name\lib | Where{$_.Name -NotMatch ".(lib|pdb)$" } | Remove-Item
 
     New-Item -ItemType Directory .\dist\$name\include
     Copy-Item -Recurse $inc .\dist\$name\include
@@ -67,9 +67,8 @@ New-Item -ItemType Directory .\dist
 
 # lxml expects iconv to be called iconv, not libiconv
 Dir $iconvLib\libiconv* | Copy-Item -Force -Destination {Join-Path $iconvLib ($_.Name -replace "libiconv","iconv") }
-Remove-Item (Join-Path $iconvLib iconv_static.tlog)
 
-BundleRelease "iconv-1.14.$distname" (dir $iconvLib\iconv* | Where-Object {$_.Name -notmatch "^libiconv"}) (dir $iconvInc\*)
+BundleRelease "iconv-1.14.$distname" (dir $iconvLib\iconv_a*) (dir $iconvInc\*)
 BundleRelease "libxml2-2.9.4.$distname" (dir $xmlLib\*) (Get-Item $xmlInc\libxml)
 BundleRelease "libxslt-1.1.29.$distname" (dir .\libxslt\win32\bin.msvc\*) (Get-Item .\libxslt\libxslt,.\libxslt\libexslt)
 BundleRelease "zlib-1.2.8.$distname" (Get-Item .\zlib\*.*) (Get-Item .\zlib\zconf.h,.\zlib\zlib.h)
