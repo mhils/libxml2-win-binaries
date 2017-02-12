@@ -14,5 +14,5 @@ build_script:
        .\build.ps1
     }
 test: off
-artifacts:
-- path: dist/*
+test_script:
+- ps: Get-ChildItem dist\*.zip | % { Push-AppveyorArtifact $_.FullName -FileName $_.Name }
