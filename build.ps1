@@ -50,7 +50,7 @@ Function BundleRelease($name, $lib, $inc)
 
     New-Item -ItemType Directory .\dist\$name\lib
     Copy-Item -Recurse $lib .\dist\$name\lib
-    Get-ChildItem -File -Recurse .\dist\$name\lib | Where{$_.Name -NotMatch ".(lib|exp)$" } | Remove-Item
+    Get-ChildItem -File -Recurse .\dist\$name\lib | Where{$_.Name -NotMatch ".(lib|pdb)$" } | Remove-Item
 
     New-Item -ItemType Directory .\dist\$name\include
     Copy-Item -Recurse $inc .\dist\$name\include
