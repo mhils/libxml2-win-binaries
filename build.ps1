@@ -1,25 +1,32 @@
 <#
 This script builds libiconv,libxml2 and libxslt
 #>
-Param([switch]$x64)
+Param(
+    [switch]$x64,
+    [switch]$vs2008
+)
 
 $ErrorActionPreference = "Stop"
 Import-Module Pscx
 
 $x64Dir = If($x64) { "\x64" } Else { "" }
 $distname = If($x64) { "win64" } Else { "win32" }
+If($vs2008) { $distname = "vs2008.$distname" }
+$vcvarsarch = If($x64) { "amd64" } Else { "x86" }
+$vsver = If($vs2008) { "90" } Else { "140" }
 
 Set-Location $PSScriptRoot
 
-# Change theset two lines to change VS version
-if($x64) {
-    Import-VisualStudioVars -VisualStudioVersion 140 -Architecture x64
-} else {
-    Import-VisualStudioVars -VisualStudioVersion 140 -Architecture x86
-}
+Import-VisualStudioVars -VisualStudioVersion $vsver -Architecture $vcvarsarch
 
-Set-Location .\libiconv\MSVC14
-msbuild libiconv.sln /p:Configuration=Release /t:libiconv_static
+if($vs2008) {
+    Set-Location .\libiconv\MSVC9
+    $vcarch = If($x64) { "x64" } Else {"Win32"}
+    vcbuild libiconv_static\libiconv_static.vcproj "Release|$vcarch"
+} else {
+    Set-Location .\libiconv\MSVC14
+    msbuild libiconv.sln /p:Configuration=Release /t:libiconv_static
+}
 $iconvLib = Join-Path (pwd) libiconv_static$x64Dir\Release
 $iconvInc = Join-Path (pwd) ..\source\include
 Set-Location ..\..
