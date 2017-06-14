@@ -1,9 +1,9 @@
 environment:
   matrix:
   - arch: x86
-    vsver: 150
+    vsver: 140
   - arch: x64
-    vsver: 150
+    vsver: 140
   - arch: x86
     vsver: 90
   - arch: x64

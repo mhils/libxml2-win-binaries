@@ -16,11 +16,10 @@ $vcvarsarch = If($arch -eq "x64") { "amd64" } Else { "x86" }
 
 Set-Location $PSScriptRoot
 
-$VisualStudioVersion = [string]$vsver
-Import-VisualStudioVars -VisualStudioVersion $VisualStudioVersion -Architecture $vcvarsarch
+Import-VisualStudioVars -VisualStudioVersion [string]$vsver -Architecture $vcvarsarch
 
 Set-Location (".\libiconv\MSVC" + [string]($vsver / 10))
-if($vsver -eq 9) {
+if($vsver -eq 90) {
     $vcarch = If($arch -eq "x64") { "x64" } Else {"Win32"}
     vcbuild libiconv_static\libiconv_static.vcproj "Release|$vcarch"
 } else {
