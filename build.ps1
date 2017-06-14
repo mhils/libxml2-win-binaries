@@ -11,15 +11,15 @@ Import-Module Pscx
 
 $x64Dir = If($arch -eq "x64") { "\x64" } Else { "" }
 $distname = If($arch -eq "x64") { "win64" } Else { "win32" }
-If($vsver -eq 9) { $distname = "vs2008.$distname" }
+If($vsver -eq 90) { $distname = "vs2008.$distname" }
 $vcvarsarch = If($arch -eq "x64") { "amd64" } Else { "x86" }
 
 Set-Location $PSScriptRoot
 
-$VisualStudioVersion = [string]($vsver * 10)
+$VisualStudioVersion = [string]$vsver
 Import-VisualStudioVars -VisualStudioVersion $VisualStudioVersion -Architecture $vcvarsarch
 
-Set-Location (".\libiconv\MSVC" + $vsver)
+Set-Location (".\libiconv\MSVC" + [string]($vsver / 10))
 if($vsver -eq 9) {
     $vcarch = If($arch -eq "x64") { "x64" } Else {"Win32"}
     vcbuild libiconv_static\libiconv_static.vcproj "Release|$vcarch"
