@@ -10,3 +10,9 @@
 [submodule "zlib"]
 	path = zlib
 	url = https://github.com/winlibs/zlib.git
+[submodule "openssl"]
+	path = openssl
+	url = https://github.com/winlibs/openssl
+[submodule "xmlsec"]
+	path = xmlsec
+	url = https://github.com/lsh123/xmlsec
