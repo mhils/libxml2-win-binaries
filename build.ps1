@@ -1,5 +1,5 @@
 <#
-This script builds libiconv,libxml2 and libxslt
+This script builds libiconv,libxml2, libxslt, openssl and xmlsec
 #>
 Param(
     [switch]$x64,
@@ -59,7 +59,32 @@ Set-Location .\libxslt\win32
 cscript configure.js lib="$zlibLib;$iconvLib;$xmlLib" include="$zlibInc;$iconvInc;$xmlInc" vcmanifest=yes zlib=yes
 $p = Start-Process -NoNewWindow -Wait -PassThru nmake "libxslta libexslta"
 ThrowIfError $p.ExitCode "libxslt"
+$xsltLib = Join-Path (pwd) bin.msvc
+$xsltInc = Join-Path (pwd) ..
 Set-Location ..\..
+
+# openssl
+$sslTarget = If($x64) { "VC-WIN64A" } Else { "VC-WIN32" }
+$sslDo = If($x64) { "do_win64a.bat" } Else { "do_ms.bat" }
+
+Set-Location .\openssl
+Start-Process -NoNewWindow -Wait perl "Configure no-asm enable-static-engine $sslTarget"
+Start-Process -NoNewWindow -Wait .\ms\$sslDo
+$p = Start-Process -NoNewWindow -Wait -PassThru nmake "-f .\ms\nt.mak init lib"
+ThrowIfError $p.ExitCode "openssl"
+
+$sslLib = Join-Path (pwd) "out32"
+$sslInc = Join-Path (pwd) "inc32"
+Set-Location ..
+
+# xmlsec
+Set-Location .\xmlsec\win32
+cscript configure.js lib="$zlibLib;$iconvLib;$xmlLib;$sslLib;$xsltLib" include="$zlibInc;$iconvInc;$xmlInc;$sslInc;$xsltInc" iconv=yes xslt=yes unicode=yes static=yes with-dl=no
+$p = Start-Process -NoNewWindow -Wait -PassThru nmake xmlseca
+ThrowIfError $p.ExitCode "xmlsec"
+$xmlsecLib = Join-Path (pwd) binaries
+$xmlsecInc = Join-Path (pwd) ..\include
+Set-Location ../..
 
 # Pushed by Import-VisualStudioVars
 Pop-EnvironmentBlock
@@ -89,5 +114,7 @@ Dir $iconvLib\libiconv* | Copy-Item -Force -Destination {Join-Path $iconvLib ($_
 
 BundleRelease "iconv-1.14.$distname" (dir $iconvLib\iconv_a*) (dir $iconvInc\*)
 BundleRelease "libxml2-2.9.4.$distname" (dir $xmlLib\*) (Get-Item $xmlInc\libxml)
-BundleRelease "libxslt-1.1.29.$distname" (dir .\libxslt\win32\bin.msvc\*) (Get-Item .\libxslt\libxslt,.\libxslt\libexslt)
+BundleRelease "libxslt-1.1.29.$distname" (dir $xsltLib\*) (Get-Item .\libxslt\libxslt,.\libxslt\libexslt)
 BundleRelease "zlib-1.2.8.$distname" (Get-Item .\zlib\*.*) (Get-Item .\zlib\zconf.h,.\zlib\zlib.h)
+BundleRelease "openssl-1.0.1.$distname" (dir $sslLib\*) (Get-Item $sslInc\openssl)
+BundleRelease "xmlsec-1.2.24.$distname" (dir $xmlsecLib\*) (Get-Item $xmlsecInc\xmlsec)
