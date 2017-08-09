@@ -6,6 +6,14 @@ Param(
     [switch]$vs2008
 )
 
+Function ThrowIfError($exitCode, $module)
+{
+    if ($exitCode -ne 0)
+    {
+        throw "Cannot build: $module."
+    }
+}
+
 $ErrorActionPreference = "Stop"
 Import-Module Pscx
 
@@ -27,26 +35,30 @@ if($vs2008) {
     Set-Location .\libiconv\MSVC14
     msbuild libiconv.sln /p:Configuration=Release /t:libiconv_static
 }
+ThrowIfError $LastExitCode "libiconv"
 $iconvLib = Join-Path (pwd) libiconv_static$x64Dir\Release
 $iconvInc = Join-Path (pwd) ..\source\include
 Set-Location ..\..
 
 Set-Location .\zlib
-Start-Process -NoNewWindow -Wait nmake "-f win32/Makefile.msc zlib.lib"
+$p = Start-Process -NoNewWindow -Wait -PassThru nmake "-f win32/Makefile.msc zlib.lib"
+ThrowIfError $p.ExitCode "zlib"
 $zlibLib = (pwd)
 $zlibInc = (pwd)
 Set-Location ..
 
 Set-Location .\libxml2\win32
 cscript configure.js lib="$zlibLib;$iconvLib" include="$zlibInc;$iconvInc" vcmanifest=yes zlib=yes
-Start-Process -NoNewWindow -Wait nmake libxmla
+$p = Start-Process -NoNewWindow -Wait -PassThru nmake libxmla
+ThrowIfError $p.ExitCode "libxml"
 $xmlLib = Join-Path (pwd) bin.msvc
 $xmlInc = Join-Path (pwd) ..\include
 Set-Location ..\..
 
 Set-Location .\libxslt\win32
 cscript configure.js lib="$zlibLib;$iconvLib;$xmlLib" include="$zlibInc;$iconvInc;$xmlInc" vcmanifest=yes zlib=yes
-Start-Process -NoNewWindow -Wait nmake "libxslta libexslta"
+$p = Start-Process -NoNewWindow -Wait -PassThru nmake "libxslta libexslta"
+ThrowIfError $p.ExitCode "libxslt"
 Set-Location ..\..
 
 # Pushed by Import-VisualStudioVars
