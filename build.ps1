@@ -75,7 +75,7 @@ New-Item -ItemType Directory .\dist
 # lxml expects iconv to be called iconv, not libiconv
 Dir $iconvLib\libiconv* | Copy-Item -Force -Destination {Join-Path $iconvLib ($_.Name -replace "libiconv","iconv") }
 
-BundleRelease "iconv-1.14.$distname" (dir $iconvLib\iconv_a*) (dir $iconvInc\*)
-BundleRelease "libxml2-2.9.4.$distname" (dir $xmlLib\*) (Get-Item $xmlInc\libxml)
-BundleRelease "libxslt-1.1.29.$distname" (dir .\libxslt\win32\bin.msvc\*) (Get-Item .\libxslt\libxslt,.\libxslt\libexslt)
-BundleRelease "zlib-1.2.8.$distname" (Get-Item .\zlib\*.*) (Get-Item .\zlib\zconf.h,.\zlib\zlib.h)
+BundleRelease "iconv-1.15.$distname" (dir $iconvLib\iconv_a*) (dir $iconvInc\*)
+BundleRelease "libxml2-2.9.5.$distname" (dir $xmlLib\*) (Get-Item $xmlInc\libxml)
+BundleRelease "libxslt-1.1.30.$distname" (dir .\libxslt\win32\bin.msvc\*) (Get-Item .\libxslt\libxslt,.\libxslt\libexslt)
+BundleRelease "zlib-1.2.11.$distname" (Get-Item .\zlib\*.*) (Get-Item .\zlib\zconf.h,.\zlib\zlib.h)
