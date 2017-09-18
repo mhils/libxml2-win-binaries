@@ -2,29 +2,27 @@
 This script builds libiconv,libxml2 and libxslt
 #>
 Param(
-    [switch]$x64,
-    [switch]$vs2008
+	[string]$arch,
+	[int]$vsver
 )
 
 $ErrorActionPreference = "Stop"
 Import-Module Pscx
 
-$x64Dir = If($x64) { "\x64" } Else { "" }
-$distname = If($x64) { "win64" } Else { "win32" }
-If($vs2008) { $distname = "vs2008.$distname" }
-$vcvarsarch = If($x64) { "amd64" } Else { "x86" }
-$vsver = If($vs2008) { "90" } Else { "140" }
+$x64Dir = If($arch -eq "x64") { "\x64" } Else { "" }
+$distname = If($arch -eq "x64") { "win64" } Else { "win32" }
+If($vsver -eq 90) { $distname = "vs2008.$distname" }
+$vcvarsarch = If($arch -eq "x64") { "amd64" } Else { "x86" }
 
 Set-Location $PSScriptRoot
 
-Import-VisualStudioVars -VisualStudioVersion $vsver -Architecture $vcvarsarch
+Import-VisualStudioVars -VisualStudioVersion [string]$vsver -Architecture $vcvarsarch
 
-if($vs2008) {
-    Set-Location .\libiconv\MSVC9
-    $vcarch = If($x64) { "x64" } Else {"Win32"}
+Set-Location (".\libiconv\MSVC" + [string]($vsver / 10))
+if($vsver -eq 90) {
+    $vcarch = If($arch -eq "x64") { "x64" } Else {"Win32"}
     vcbuild libiconv_static\libiconv_static.vcproj "Release|$vcarch"
 } else {
-    Set-Location .\libiconv\MSVC14
     msbuild libiconv.sln /p:Configuration=Release /t:libiconv_static
 }
 $iconvLib = Join-Path (pwd) libiconv_static$x64Dir\Release
