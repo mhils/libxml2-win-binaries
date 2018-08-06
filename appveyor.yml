@@ -12,7 +12,7 @@ environment:
     PATCH_VS2008: True
 install:
 - cmd: git submodule update --init --recursive
-- ps: install-module pscx -scope CurrentUser
+- ps: install-module pscx -scope CurrentUser -AllowClobber
 - ps: >-
     if ($env:PATCH_VS2008 -eq 'True') {
         # http://scikit-ci-addons.readthedocs.io/en/latest/addons.html#patch-vs2008-py
