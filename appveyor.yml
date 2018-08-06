@@ -1,6 +1,10 @@
 environment:
   matrix:
   - Architecture: x86
+    Compiler: vs2017
+  - Architecture: x64
+    Compiler: vs2017
+  - Architecture: x86
     Compiler: vs2015
   - Architecture: x64
     Compiler: vs2015
