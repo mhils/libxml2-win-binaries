@@ -10,8 +10,8 @@ install:
 
 build: off
 build_script:
-- ps: >-
-    .\build.ps1 -arm64
+- cmd: >-
+    "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsx86_arm64.bat" && powershell .\build.ps1 -arm64
 
 test: off
 test_script:
