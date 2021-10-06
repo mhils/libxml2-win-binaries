@@ -10,7 +10,7 @@ Param(
 $ErrorActionPreference = "Stop"
 Import-Module Pscx
 
-$platDir = If($x64) { "\x64" } ElseIf ($arm64) { "\arm64" } Else { "\win32" }
+$platDir = If($x64) { "\x64" } ElseIf ($arm64) { "\arm64" } Else { "" }
 $distname = If($x64) { "win64" } ElseIf($arm64) { "win-arm64" } Else { "win32" }
 If($vs2008) { $distname = "vs2008.$distname" }
 $vcvarsarch = If($x64) { "amd64" } ElseIf ($arm64) { "arm64" } Else { "x86" }
