@@ -18,7 +18,6 @@ $vsver = If($vs2008) { "90" } Else { "140" }
 
 Set-Location $PSScriptRoot
 
-
 if($vs2008) {
     Set-Location .\libiconv\MSVC9
     $vcarch = If($x64) { "x64" } Else {"Win32"}

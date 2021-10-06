@@ -2,7 +2,15 @@ image: Visual Studio 2019
 
 environment:
   matrix:
+  - Architecture: x86
+    VCVARS: vcvars32
+    Switch:
+  - Architecture: x64
+    VCVARS: vcvarsx86_amd64
+    Switch: -x64
   - Architecture: arm64
+    VCVARS: vcvarsx86_arm64
+    Switch: -arm64
 
 install:
 - cmd: git submodule update --init --recursive
@@ -11,7 +19,7 @@ install:
 build: off
 build_script:
 - cmd: >-
-    "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsx86_arm64.bat" && powershell .\build.ps1 -arm64
+    "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\%env:VCVARS.bat%" && powershell .\build.ps1 -%env:Switch%
 
 test: off
 test_script:
