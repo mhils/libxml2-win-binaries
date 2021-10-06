@@ -18,7 +18,6 @@ $vsver = If($vs2008) { "90" } Else { "140" }
 
 Set-Location $PSScriptRoot
 
-Import-VisualStudioVars -VisualStudioVersion $vsver -Architecture $vcvarsarch
 
 if($vs2008) {
     Set-Location .\libiconv\MSVC9
@@ -51,7 +50,6 @@ Start-Process -NoNewWindow -Wait nmake "libxslta libexslta"
 Set-Location ..\..
 
 # Pushed by Import-VisualStudioVars
-Pop-EnvironmentBlock
 
 # Bundle releases
 Function BundleRelease($name, $lib, $inc)
