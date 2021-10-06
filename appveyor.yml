@@ -19,7 +19,7 @@ install:
 build: off
 build_script:
 - cmd: >-
-    "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\%env:VCVARS%.bat" && powershell .\build.ps1 -%env:Switch%
+    "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\%VCVARS%.bat" && powershell .\build.ps1 -%env:Switch%
 
 test: off
 test_script:
