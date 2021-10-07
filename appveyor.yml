@@ -1,15 +1,23 @@
 environment:
   matrix:
   - Architecture: x86
-    Compiler: vs2015
+    Compiler: vs2019
+    APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
   - Architecture: x64
-    Compiler: vs2015
+    Compiler: vs2019
+    APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+  - Architecture: arm64
+    Compiler: vs2019
+    APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
   - Architecture: x86
     Compiler: vs2008
+    APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
   - Architecture: x64
     Compiler: vs2008
     PYTHON_ARCH: 64
     PATCH_VS2008: True
+    APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+
 install:
 - cmd: git submodule update --init --recursive
 - ps: install-module pscx -scope CurrentUser -AllowClobber
@@ -26,9 +34,11 @@ build_script:
 - ps: >-
     $x64param = if ($env:Architecture -eq 'x64') { $true } else { $false }
 
+    $arm64param = if ($env:Architecture -eq 'arm64') { $true } else { $false }
+
     $vs2008param = if ($env:Compiler -eq 'vs2008') { $true } else { $false }
 
-    .\build.ps1 -x64:$x64param -vs2008:$vs2008param
+    .\build.ps1 -x64:$x64param -arm64:$arm64param -vs2008:$vs2008param
 
 test: off
 test_script:
