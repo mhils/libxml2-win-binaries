@@ -177,7 +177,7 @@
       <ProgramDataBaseFileName>$(IntDir)libiconv_a_debug.pdb</ProgramDataBaseFileName>
     </ClCompile>
     <Lib>
-      <OutputFile>x64\Debug\libiconv_a_debug.lib</OutputFile>
+      <OutputFile>ARM64\Debug\libiconv_a_debug.lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -240,7 +240,7 @@
       <ProgramDataBaseFileName>$(IntDir)libiconv_a.pdb</ProgramDataBaseFileName>
     </ClCompile>
     <Lib>
-      <OutputFile>x64\Release\libiconv_a.lib</OutputFile>
+      <OutputFile>ARM64\Release\libiconv_a.lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
