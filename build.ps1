@@ -3,33 +3,46 @@ This script builds libiconv,libxml2 and libxslt
 #>
 Param(
     [switch]$x64,
+    [switch]$arm64,
     [switch]$vs2008
 )
 
 $ErrorActionPreference = "Stop"
 Import-Module Pscx
 
-$x64Dir = If($x64) { "\x64" } Else { "" }
-$distname = If($x64) { "win64" } Else { "win32" }
+$platDir = If($x64) { "\x64" } ElseIf ($arm64) { "\arm64" } Else { "" }
+$distname = If($x64) { "win64" } ElseIf($arm64) { "win-arm64" } Else { "win32" }
 If($vs2008) { $distname = "vs2008.$distname" }
-$vcvarsarch = If($x64) { "amd64" } Else { "x86" }
-$vsver = If($vs2008) { "90" } Else { "140" }
+
+If($vs2008) {
+    $vcvarsarch = If($x64) { "amd64" } Else { "x86" }
+    Import-VisualStudioVars -VisualStudioVersion "90" -Architecture $vcvarsarch
+} Else {
+    $vcvarsarch = If($x64) { "x86_amd64" } ElseIf ($arm64) { "x86_arm64" } Else { "32" }
+    cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars$vcvarsarch.bat`" && set > %temp%\vcvars$vcvarsarch.txt"
+    Get-Content "$env:temp\vcvars$vcvarsarch.txt" | Foreach-Object {
+        if ($_ -match "^(.*?)=(.*)$") {
+            Set-Content "env:\$($matches[1])" $matches[2]
+        }
+    }
+}
 
 Set-Location $PSScriptRoot
-
-Import-VisualStudioVars -VisualStudioVersion $vsver -Architecture $vcvarsarch
 
 if($vs2008) {
     Set-Location .\libiconv\MSVC9
     $vcarch = If($x64) { "x64" } Else {"Win32"}
     vcbuild libiconv_static\libiconv_static.vcproj "Release|$vcarch"
+    $iconvLib = Join-Path (pwd) libiconv_static$platDir\Release
 } else {
-    Set-Location .\libiconv\MSVC14
-    msbuild libiconv.sln /p:Configuration=Release /t:libiconv_static
+    Set-Location .\libiconv_msvc16\
+    msbuild libiconv_static\libiconv_static.vcxproj /p:Configuration=Release
+    $iconvLib = Join-Path (pwd) libiconv_static$platDir\Release
 }
-$iconvLib = Join-Path (pwd) libiconv_static$x64Dir\Release
-$iconvInc = Join-Path (pwd) ..\source\include
-Set-Location ..\..
+
+$iconvInc = Join-Path $PSScriptRoot libiconv\source\include
+
+Set-Location $PSScriptRoot
 
 Set-Location .\zlib
 Start-Process -NoNewWindow -Wait nmake "-f win32/Makefile.msc zlib.lib"
@@ -49,8 +62,10 @@ cscript configure.js lib="$zlibLib;$iconvLib;$xmlLib" include="$zlibInc;$iconvIn
 Start-Process -NoNewWindow -Wait nmake "libxslta libexslta"
 Set-Location ..\..
 
-# Pushed by Import-VisualStudioVars
-Pop-EnvironmentBlock
+if($vs2008) {
+    # Pushed by Import-VisualStudioVars
+    Pop-EnvironmentBlock
+}
 
 # Bundle releases
 Function BundleRelease($name, $lib, $inc)
