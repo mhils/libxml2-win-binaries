@@ -35,9 +35,9 @@ if($vs2008) {
     vcbuild libiconv_static\libiconv_static.vcproj "Release|$vcarch"
     $iconvLib = Join-Path (pwd) libiconv_static$platDir\Release
 } else {
-    Set-Location .\libiconv_msvc16\
+    Set-Location .\libiconv\MSVC16
     msbuild libiconv_static\libiconv_static.vcxproj /p:Configuration=Release
-    $iconvLib = Join-Path (pwd) libiconv_static$platDir\Release
+    $iconvLib = Join-Path (pwd) $platDir\lib
 }
 
 $iconvInc = Join-Path $PSScriptRoot libiconv\source\include
@@ -45,9 +45,12 @@ $iconvInc = Join-Path $PSScriptRoot libiconv\source\include
 Set-Location $PSScriptRoot
 
 Set-Location .\zlib
-Start-Process -NoNewWindow -Wait nmake "-f win32/Makefile.msc zlib.lib"
+Start-Process -NoNewWindow -Wait nmake "-f win32/Makefile.msc zlib_a.lib"
 $zlibLib = (pwd)
 $zlibInc = (pwd)
+
+Move-Item zlib_a.lib zlib.lib -force
+
 Set-Location ..
 
 Set-Location .\libxml2\win32

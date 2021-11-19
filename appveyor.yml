@@ -20,6 +20,9 @@ environment:
 
 install:
 - cmd: git submodule update --init --recursive
+- cmd: cd libiconv
+- cmd: git apply ..\libiconv.patch
+- cmd: cd ..
 - ps: install-module pscx -scope CurrentUser -AllowClobber
 - ps: >-
     if ($env:PATCH_VS2008 -eq 'True') {
